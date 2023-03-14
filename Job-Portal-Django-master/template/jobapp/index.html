@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- HOME -->
+<section class="home-section section-hero overlay bg-image"
+  style="background-image: url('{% static 'images/hero_1.jpg' %}');" id="home-section">
+
+  <div class="container">
+    <div class="row align-items-center justify-content-center">
+      <div class="col-md-12">
+        <div class="mb-5 text-center">
+          <h1 class="text-white font-weight-bold">The Best Way To Get Experience!</h1>
+          <p>Also the best way to hire students!</p>
+        </div>
+        <form method="GET" action="{% url 'jobapp:search_result' %}" class="search-jobs-form">
+          {% include 'jobapp/search.html' %}
+        </form>
+      </div>
+    </div>
+  </div>
+  
+</section>
+
+
+<section class="py-5 bg-image overlay-primary fixed overlay" style="background-image: url('{% static 'images/hero_1.jpg' %}');">
+  <div class="container">
+    {% if request.user.role == "employer" %}
+    <div class="row align-items-center">
+      <div class="col-md-8">
+        <h2 class="text-white">Want To Hire?</h2>
+        <p class="mb-0 text-white lead">Hire students for half the cost!</p>
+      </div>
+      <div class="col-md-3 ml-auto">
+        <a href="{% url 'jobapp:create-job' %}" class="btn btn-warning btn-block btn-lg">Post Your Job</a>
+      </div>
+    </div>
+    {% elif request.user.role == "employee" %}
+    <div class="row align-items-center">
+      <div class="col-md-8">
+        <h2 class="text-white">Looking For A Job?</h2>
+        <p class="mb-0 text-white lead">Sign up and apply today!</p>
+      </div>
+      <div class="col-md-3 ml-auto">
+        <a href="{% url 'jobapp:job-list' %}" class="btn btn-warning btn-block btn-lg">Job List</a>
+      </div>
+    </div>
+    {% else %}
+    <div class="row align-items-center">
+      <div class="col-md-8">
+        <h2 class="text-white">Looking For A Job?</h2>
+        <p class="mb-0 text-white lead">Sign up and apply today!</p>
+      </div>
+      <div class="col-md-3 ml-auto">
+        <a href="{% url 'account:employee-registration' %}" class="btn btn-warning btn-block btn-lg">Sign Up</a>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+
+
+    <!-- <div class="container">
+      <div class="row">
+        <div class="col-lg-6 align-self-center text-center text-lg-left">
+          <blockquote>
+            <p>&ldquo;Soluta quasi cum delectus eum facilis recusandae nesciunt molestias accusantium libero dolores
+              repellat id in dolorem laborum ad modi qui at quas dolorum voluptatem voluptatum repudiandae.&rdquo;</p>
+            <p><cite> &mdash; Corey Woods, @Dribbble</cite></p>
+          </blockquote>
+        </div>
+        <div class="col-lg-6 align-self-end text-center text-lg-right">
+          <img src="images/person_transparent_2.png" alt="Image" class="img-fluid mb-0">
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6 align-self-center text-center text-lg-left">
+          <blockquote>
+            <p>&ldquo;Soluta quasi cum delectus eum facilis recusandae nesciunt molestias accusantium libero dolores
+              repellat id in dolorem laborum ad modi qui at quas dolorum voluptatem voluptatum repudiandae.&rdquo;</p>
+            <p><cite> &mdash; Chris Peters, @Google</cite></p>
+          </blockquote>
+        </div>
+        <div class="col-lg-6 align-self-end text-center text-lg-right">
+          <img src="images/person_transparent.png" alt="Image" class="img-fluid mb-0">
+        </div>
+      </div>
+    </div> -->
+
+  </div>
+
+</section>
+
+
+{% endblock %}
+{% block extra_scripts %}
+<script>
+
+$("#ajax_listing_paginattion" ).delegate( "a#ajax_paginator", "click", function( event ) {
+		event.preventDefault();
+    joblist = ``
+    next_paging = ``
+    prev_paging = ``
+    page_navigator = ``
+		var page_ref = $(this).attr('href');
+    var page_number = page_ref.slice(6);
+    console.log('page_number', page_number);
+		$.ajax({
+					type: "GET",
+					url: "{% url 'jobapp:home' %}", 
+					data : {    
+          page : page_number, 
+				},
+        success: function (response) {
+          $('#job').html('')
+                    response.job_lists.map(function (job) {
+
+                        joblist+=`
+                          <li id="next" class="job-listing d-block d-sm-flex pb-3 pb-sm-0 align-items-center">
+                            <a href="/job/${job.id}/"></a>
+                              <div class="job-listing-logo">
+                                <img src="{% static 'images/i.jpg' %}" alt="Free Website Template by Free-Template.co"
+                                  class="img-fluid">
+                              </div>
+
+                              <div class="job-listing-about d-sm-flex custom-width w-100 justify-content-between mx-4">
+                                <div class="job-listing-position custom-width w-50 mb-3 mb-sm-0">
+                                  <h2>${ job.title }</h2>
+                                  <strong>${ job.company_name }</strong>
+                                </div>
+                                <div class="job-listing-location mb-3 mb-sm-0 custom-width w-25">
+                                  <span class="icon-room"></span>${ job.location } 
+                                </div>
+                                
+                                <div class="job-listing-meta">
+                                  ${ job.job_type == '1'
+                                  ?  
+                                  `<span class="badge badge-success">
+                                    Full Time
+                                  </span>`
+                                  : 
+                                  job.job_type == '2' 
+                                  ?  
+                                  `<span class="badge badge-danger">
+                                    Part Time
+                                  </span>` 
+                                  :
+                                  `<span class="badge badge-info">
+                                    Internship
+                                  </span>
+                                  `
+                                  }
+                                </div>
+                              </div>
+                            </li>
+                        ` 
+                      })
+
+                        $('#job').html(joblist)
+                        response.next_page_number != null ?
+                        next_paging+=`<a id="ajax_paginator" class="next" href="?page=${ response.next_page_number }">Next</a>`
+                        : ''
+
+                        $('div>#next_page').html(next_paging)
+                        $('div>.active').removeClass('active')
+                        $('div>.ajax_paginator_'+response.current_page_no).addClass('active')
+                        
+                        // .attr('href','http://example.com')
+                        // .removeAttr("href");
+                        
+                        response.current_page_no > 1 ?
+                        prev_paging+=`<a id="ajax_paginator" href="?page=${ response.prev_page_number }" class="prev">Prev</a>`
+                        : ''
+                        $('div>#prev_page').html(prev_paging)
+
+                        page_navigator+=`Showing ${ response.current_page_no } of ${ response.no_of_page } Pages`
+                        $('div>#page_navigator').html(page_navigator)
+                      
+                    },
+                    
+				error: function () {
+					alert('Error Occured');
+				}
+			});
+
+	});  
+  
+  
+	</script>
+{% endblock %}
+
+

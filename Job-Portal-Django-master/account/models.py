@@ -10,8 +10,8 @@ JOB_TYPE = (
 )
 
 ROLE = (
-    ('business', "Business"), 
-    ('student', "Student"),
+    ('employer', "Employer"), 
+    ('employee', "Employee"),
 )
 
 class User(AbstractUser):
